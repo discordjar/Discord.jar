@@ -1,0 +1,10 @@
+
+#Directories
+.idea
+.gradle
+
+#Compiled Class Files
+*.class
+*.classpath
+
+
