@@ -1,6 +1,7 @@
 package me.hammer86gn.discordjar.api;
 
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordWebsocketClient;
+import me.hammer86gn.discordjar.api.connection.websocket.intents.GatewayIntents;
 import me.hammer86gn.discordjar.impl.DJARimpl;
 
 import java.net.URISyntaxException;
@@ -25,10 +26,17 @@ public class DJARManager {
         this.intents = 513;
     }
 
+    @Deprecated
     public DJARManager(String token,boolean useBotSharding,int intents) {
         this.token = token;
         this.useBotSharding = useBotSharding;
         this.intents = intents;
+    }
+
+    public DJARManager(String token, boolean useBotSharding, GatewayIntents... intents) {
+        this.token = token;
+        this.useBotSharding = useBotSharding;
+        this.intents = GatewayIntents.summarize(intents);
     }
 
     public DJARManager setUseBotSharding(boolean useBotSharding) {
@@ -41,8 +49,14 @@ public class DJARManager {
         return this;
     }
 
+    @Deprecated
     public DJARManager setGatewayIntents(int intents) {
         this.intents = intents;
+        return this;
+    }
+
+    public DJARManager setGatewayIntents(GatewayIntents... intents) {
+        this.intents = GatewayIntents.summarize(intents);
         return this;
     }
 
