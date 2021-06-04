@@ -3,6 +3,7 @@ package me.hammer86gn.discordjar.api.connection.websocket;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.hammer86gn.discordjar.api.DJAR;
+import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -23,6 +24,8 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
     private boolean resume = false;
 
+    private long requestsSent = 0;
+
     public DiscordWebsocketClient(DJAR djar) throws URISyntaxException {
         super(new URI("wss://gateway.discord.gg/?v=9&encoding=json"));
         this.djar = djar;
@@ -35,6 +38,18 @@ public class DiscordWebsocketClient extends WebSocketClient {
         }else {
             resume(djar.getBotToken(), session_id,seqNum);
         }
+
+        new Thread(() -> {
+            while(!this.isClosed()) {
+                requestsSent = 0;
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        },"RATELIMIT-WEBSOCKET").start();
+
     }
 
     @Override
@@ -102,7 +117,19 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
         payload.addData(data);
 
-        send(payload.build());
+        try {
+            sendPayload(payload.build());
+        } catch (RateLimitOverflowException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPayload(String payload) throws RateLimitOverflowException {
+        if (requestsSent >= 120) {
+            throw new RateLimitOverflowException("You may only send 120 requests per 60 seconds");
+        } else {
+            this.send(payload);
+        }
     }
 
     private void heartbeat(JsonObject message) {
@@ -114,7 +141,11 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
                     PayloadBuilder heartbeat = new PayloadBuilder(1);
 
-                    send(heartbeat.build((Long) null));
+                    try {
+                        sendPayload(heartbeat.build((Long) null));
+                    } catch (RateLimitOverflowException e) {
+                        e.printStackTrace();
+                    }
 
                     try {
                         Thread.sleep(heartbeat_int);
@@ -127,7 +158,11 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
                     PayloadBuilder heartbeatPayload = new PayloadBuilder(1);
 
-                    send(heartbeatPayload.build(seqNum));
+                    try {
+                        sendPayload(heartbeatPayload.build(seqNum));
+                    } catch (RateLimitOverflowException e) {
+                        e.printStackTrace();
+                    }
 
                     try {
                         Thread.sleep(heartbeat_int);
@@ -150,7 +185,11 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
         payload.add("d",data);
 
-        this.send(payload.toString());
+        try {
+            this.sendPayload(payload.toString());
+        } catch (RateLimitOverflowException e) {
+            e.printStackTrace();
+        }
     }
 
 }
