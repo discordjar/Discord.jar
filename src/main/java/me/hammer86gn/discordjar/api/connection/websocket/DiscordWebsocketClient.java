@@ -3,6 +3,7 @@ package me.hammer86gn.discordjar.api.connection.websocket;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.hammer86gn.discordjar.api.DJAR;
+import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -20,6 +21,8 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
     private String session_id;
 
+    private boolean resume = false;
+
     public DiscordWebsocketClient(DJAR djar) throws URISyntaxException {
         super(new URI("wss://gateway.discord.gg/?v=9&encoding=json"));
         this.djar = djar;
@@ -27,7 +30,11 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        djar.getLogger().log(Level.INFO,"Connected to Discord's Websockets");
+        if (!resume) {
+            djar.getLogger().log(Level.INFO, "Connected to Discord's Websockets");
+        }else {
+            resume(djar.getBotToken(), session_id,seqNum);
+        }
     }
 
     @Override
@@ -61,6 +68,12 @@ public class DiscordWebsocketClient extends WebSocketClient {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         djar.getLogger().log(Level.WARNING,"Connection Closed\n" + "Reason: " + reason + "\nClose Code: " + code);
+
+        if (remote) {
+            resume = true;
+            this.connect();
+        }
+
     }
 
     @Override
@@ -70,9 +83,10 @@ public class DiscordWebsocketClient extends WebSocketClient {
     }
 
     public void identify(JsonObject message) {
-        JsonObject payload = new JsonObject();
-        payload.addProperty("op",2);
+//        JsonObject payload = new JsonObject();
+//        payload.addProperty("op",2);
 
+        PayloadBuilder payload = new PayloadBuilder(2);
 
         JsonObject data = new JsonObject();
         data.addProperty("token",djar.getBotToken());
@@ -86,9 +100,9 @@ public class DiscordWebsocketClient extends WebSocketClient {
         data.add("properties",properties);
 
 
-        payload.add("d",data);
+        payload.addData(data);
 
-        send(payload.toString());
+        send(payload.build());
     }
 
     private void heartbeat(JsonObject message) {
@@ -96,9 +110,11 @@ public class DiscordWebsocketClient extends WebSocketClient {
         new Thread(() -> {
             while(!getConnection().isClosed()) {
                 if (!hasSeq) {
-                    Payload heartbeat = new Payload(1).addData((Long) null);
+//                    Payload heartbeat = new Payload(1).addData((Long) null);
 
-                    send(heartbeat.encode());
+                    PayloadBuilder heartbeat = new PayloadBuilder(1);
+
+                    send(heartbeat.build((Long) null));
 
                     try {
                         Thread.sleep(heartbeat_int);
@@ -107,9 +123,11 @@ public class DiscordWebsocketClient extends WebSocketClient {
                     }
 
                 } else {
-                    Payload heartbeat = new Payload(1).addData(seqNum);
+                   // Payload heartbeat = new Payload(1).addData(seqNum);
 
-                    send(heartbeat.encode());
+                    PayloadBuilder heartbeatPayload = new PayloadBuilder(1);
+
+                    send(heartbeatPayload.build(seqNum));
 
                     try {
                         Thread.sleep(heartbeat_int);
@@ -120,4 +138,19 @@ public class DiscordWebsocketClient extends WebSocketClient {
             }
         },"CONNECTION_KEEPALIVE").start();
     }
+
+    public void resume(String token,String session_id,long seqNum) {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("op",6);
+
+        JsonObject data = new JsonObject();
+        data.addProperty("token",token);
+        data.addProperty("session_id",session_id);
+        data.addProperty("seq",seqNum);
+
+        payload.add("d",data);
+
+        this.send(payload.toString());
+    }
+
 }
