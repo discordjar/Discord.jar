@@ -28,4 +28,9 @@ public class DJARimpl implements DJAR {
     public String getBotToken() {
         return token;
     }
+
+    @Override
+    public long getGatewayIntents() {
+        return intents;
+    }
 }
