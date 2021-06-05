@@ -26,7 +26,7 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
     private long requestsSent = 0;
 
-    public DiscordWebsocketClient(DJAR djar) throws URISyntaxException {
+    public DiscordWebsocketClient(DJAR djar,boolean sharding) throws URISyntaxException {
         super(new URI("wss://gateway.discord.gg/?v=9&encoding=json"));
         this.djar = djar;
     }
@@ -97,7 +97,7 @@ public class DiscordWebsocketClient extends WebSocketClient {
         ex.printStackTrace();
     }
 
-    public void identify(JsonObject message) {
+    private void identify(JsonObject message) {
 //        JsonObject payload = new JsonObject();
 //        payload.addProperty("op",2);
 
@@ -174,7 +174,7 @@ public class DiscordWebsocketClient extends WebSocketClient {
         },"CONNECTION_KEEPALIVE").start();
     }
 
-    public void resume(String token,String session_id,long seqNum) {
+    private void resume(String token,String session_id,long seqNum) {
         JsonObject payload = new JsonObject();
         payload.addProperty("op",6);
 
