@@ -26,7 +26,7 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
     private long requestsSent = 0;
 
-    public DiscordWebsocketClient(DJAR djar,boolean sharding) throws URISyntaxException {
+    public DiscordWebsocketClient(DJAR djar) throws URISyntaxException {
         super(new URI("wss://gateway.discord.gg/?v=9&encoding=json"));
         this.djar = djar;
     }
