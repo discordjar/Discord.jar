@@ -97,7 +97,7 @@ public class DiscordWebsocketClient extends WebSocketClient {
         ex.printStackTrace();
     }
 
-    private void identify(JsonObject message) {
+    public void identify(JsonObject message) {
 //        JsonObject payload = new JsonObject();
 //        payload.addProperty("op",2);
 

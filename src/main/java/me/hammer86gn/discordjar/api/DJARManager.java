@@ -1,5 +1,6 @@
 package me.hammer86gn.discordjar.api;
 
+import me.hammer86gn.discordjar.api.connection.websocket.DiscordShardingWebsocketClient;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordWebsocketClient;
 import me.hammer86gn.discordjar.api.connection.websocket.intents.GatewayIntents;
 import me.hammer86gn.discordjar.impl.DJARimpl;
@@ -92,10 +93,16 @@ public class DJARManager {
         return djar;
     }
 
-    public DJAR buildShardedClient() {
+    public DJAR buildShardedClient(int maxShards) {
         DJARimpl djarimpl = new DJARimpl(this.token,this.intents);
 
+        try {
+            dwsc = new DiscordShardingWebsocketClient(djarimpl,maxShards);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
+        dwsc.connect();
         return djarimpl;
     }
 
