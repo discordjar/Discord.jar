@@ -1,7 +1,10 @@
 package me.hammer86gn.discordjar.api;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordShardingWebsocketClient;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordWebsocketClient;
+import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.intents.GatewayIntents;
 import me.hammer86gn.discordjar.impl.DJARimpl;
 
@@ -105,7 +108,4 @@ public class DJARManager {
         dwsc.connect();
         return djarimpl;
     }
-
-
-
 }

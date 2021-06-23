@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        DJAR djar = new DJARManager(Hidden.TOKEN).buildShardedClient(2);
+        DJAR djar = new DJARManager(Hidden.TOKEN).buildClient();
 
     }
 
