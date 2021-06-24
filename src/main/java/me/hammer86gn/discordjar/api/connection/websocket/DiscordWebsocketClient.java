@@ -2,6 +2,7 @@ package me.hammer86gn.discordjar.api.connection.websocket;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sun.istack.internal.Nullable;
 import me.hammer86gn.discordjar.api.DJAR;
 import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
@@ -10,6 +11,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 public class DiscordWebsocketClient extends WebSocketClient {
@@ -76,7 +78,6 @@ public class DiscordWebsocketClient extends WebSocketClient {
                 hasSeq = true;
             }
         }
-
 
     }
 
@@ -191,5 +192,33 @@ public class DiscordWebsocketClient extends WebSocketClient {
             e.printStackTrace();
         }
     }
+
+    private void requestGuildMembers(long guild_id, String query, int limit, boolean presences, long user_id[], String nonce) {
+        JsonObject details = new JsonObject();
+        details.addProperty("guild_id",guild_id);
+        if (!(query == null)) {
+            details.addProperty("query",query);
+            details.addProperty("limit",limit);
+        }
+        if (presences) {
+            details.addProperty("presences",presences);
+        }
+        if (user_id != null && query == null) {
+            details.addProperty("user_ids", Arrays.toString(user_id));
+        }
+        if (nonce != null) {
+            details.addProperty("nonce",nonce);
+        }
+
+        PayloadBuilder payloadBuilder = new PayloadBuilder(8).addData(details);
+
+        try {
+            this.sendPayload(payloadBuilder.build());
+        } catch (RateLimitOverflowException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //TODO: IDK WORK OUT A SOLUTION FOR READING PACKETS EVEN THOUGH IT CURRENTLY WORKS FINE
 
 }
