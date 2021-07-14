@@ -1,10 +1,6 @@
 package me.hammer86gn.discordjar.impl;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import me.hammer86gn.discordjar.api.DJAR;
-import me.hammer86gn.discordjar.api.connection.websocket.DiscordWebsocketClient;
-import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
 
 import java.util.logging.Logger;
 

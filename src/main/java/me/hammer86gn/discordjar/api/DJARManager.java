@@ -1,11 +1,10 @@
 package me.hammer86gn.discordjar.api;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordShardingWebsocketClient;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordWebsocketClient;
-import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.intents.GatewayIntents;
+import me.hammer86gn.discordjar.api.users.activity.Activity;
+import me.hammer86gn.discordjar.api.users.activity.Status;
 import me.hammer86gn.discordjar.impl.DJARimpl;
 
 import java.net.URISyntaxException;
@@ -14,6 +13,8 @@ public class DJARManager {
 
     private String token;
     private int intents;
+
+    private Activity activity = null;
 
     private DiscordWebsocketClient dwsc;
 
@@ -86,7 +87,12 @@ public class DJARManager {
     public DJAR buildClient() {
         DJARimpl djar = new DJARimpl(this.token,this.intents);
         try {
-            dwsc = new DiscordWebsocketClient(djar);
+            if (activity != null) {
+                dwsc = new DiscordWebsocketClient(djar,activity);
+            } else {
+                dwsc = new DiscordWebsocketClient(djar);
+            }
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -107,5 +113,10 @@ public class DJARManager {
 
         dwsc.connect();
         return djarimpl;
+    }
+
+    public DJARManager setActivity(Activity activity) {
+        this.activity = activity;
+        return this;
     }
 }

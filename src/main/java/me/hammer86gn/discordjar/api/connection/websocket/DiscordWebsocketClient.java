@@ -1,11 +1,13 @@
 package me.hammer86gn.discordjar.api.connection.websocket;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.istack.internal.Nullable;
 import me.hammer86gn.discordjar.api.DJAR;
 import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
+import me.hammer86gn.discordjar.api.users.activity.Activity;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -28,9 +30,17 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
     private long requestsSent = 0;
 
+    private Activity activity;
+
     public DiscordWebsocketClient(DJAR djar) throws URISyntaxException {
         super(new URI("wss://gateway.discord.gg/?v=9&encoding=json"));
         this.djar = djar;
+    }
+
+    public DiscordWebsocketClient(DJAR djar, Activity activity) throws URISyntaxException {
+        super(new URI("wss://gateway.discord.gg/?v=9&encoding=json"));
+        this.djar = djar;
+        this.activity = activity;
     }
 
     @Override
@@ -65,6 +75,9 @@ public class DiscordWebsocketClient extends WebSocketClient {
         if (opCode == 10) {
             heartbeat(message);
             identify(message);
+            if (activity != null) {
+                updatePresence(activity.getActivity().toJson(), activity.getStatus().getId(),false);
+            }
         }
         if (opCode == 0) {
             if (message.get("t").getAsString().equals("READY")) {
@@ -214,6 +227,68 @@ public class DiscordWebsocketClient extends WebSocketClient {
 
         try {
             this.sendPayload(payloadBuilder.build());
+        } catch (RateLimitOverflowException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateVoiceStatus(long guild_id,long channel_id, boolean self_mute, boolean self_deaf) {
+        JsonObject data = new JsonObject();
+        data.addProperty("guild_id",guild_id);
+        if (channel_id == 0) {
+            JsonNull jsonNull = JsonNull.INSTANCE;
+            data.add("channel_id",jsonNull);
+        }else {
+            data.addProperty("channel_id",channel_id);
+        }
+        data.addProperty("self_mute",self_mute);
+        data.addProperty("self_deaf",self_deaf);
+
+        PayloadBuilder payloadBuilder = new PayloadBuilder(4).addData(data);
+
+        try {
+            this.sendPayload(payloadBuilder.build());
+        } catch (RateLimitOverflowException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePresence(long since, JsonObject activities, String status, boolean afk) {
+        JsonArray array = new JsonArray();
+        array.add(activities);
+
+        JsonObject object = new JsonObject();
+        object.addProperty("since",since);
+        object.add("activities",array);
+        object.addProperty("status",status);
+        object.addProperty("afk",afk);
+
+
+        PayloadBuilder builder = new PayloadBuilder(3)
+                .addData(object);
+
+        try {
+            this.sendPayload(builder.build());
+        } catch (RateLimitOverflowException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePresence(JsonObject activities, String status, boolean afk) {
+        JsonArray array = new JsonArray();
+        array.add(activities);
+
+        JsonObject object = new JsonObject();
+        object.add("since",JsonNull.INSTANCE);
+        object.add("activities",array);
+        object.addProperty("status",status);
+        object.addProperty("afk",afk);
+
+
+        PayloadBuilder builder = new PayloadBuilder(3)
+                .addData(object);
+        try {
+            this.sendPayload(builder.build());
         } catch (RateLimitOverflowException e) {
             e.printStackTrace();
         }

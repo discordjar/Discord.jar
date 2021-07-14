@@ -9,25 +9,4 @@ public interface DJAR {
     String getBotToken();
 
     long getGatewayIntents();
-
-    enum StatusType {
-      ONLINE("online"),
-      DO_NOT_DISTURB("dnd"),
-      IDLE("idle"),
-      INVISIBLE("invisible");
-
-        private final String id;
-
-        StatusType(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public int getType() {
-            return this.ordinal();
-        }
-    }
 }
