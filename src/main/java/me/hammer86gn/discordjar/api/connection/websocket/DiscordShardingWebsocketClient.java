@@ -5,19 +5,30 @@ import com.google.gson.JsonObject;
 import me.hammer86gn.discordjar.api.DJAR;
 import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
+import me.hammer86gn.discordjar.api.objects.activity.Activity;
 
 import java.net.URISyntaxException;
 
 public class DiscordShardingWebsocketClient extends DiscordWebsocketClient {
 
     private final DJAR djar;
+    private final int id;
     private final int shardTotal;
 
-    public DiscordShardingWebsocketClient(DJAR djar,int shardTotal) throws URISyntaxException {
+    public DiscordShardingWebsocketClient(DJAR djar,int id, int shardTotal) throws URISyntaxException {
         super(djar);
         this.djar = djar;
+        this.id = id;
         this.shardTotal = shardTotal;
     }
+
+    public DiscordShardingWebsocketClient(DJAR djar, Activity activity, int id, int shardTotal) throws URISyntaxException {
+        super(djar,activity);
+        this.djar = djar;
+        this.id = id;
+        this.shardTotal = shardTotal;
+    }
+
 
     @Override
     public void identify(JsonObject message) {
@@ -30,7 +41,7 @@ public class DiscordShardingWebsocketClient extends DiscordWebsocketClient {
 
 
         JsonArray sharding = new JsonArray();
-        sharding.add(0);
+        sharding.add(id);
         sharding.add(shardTotal);
 
         data.add("sharding",sharding);

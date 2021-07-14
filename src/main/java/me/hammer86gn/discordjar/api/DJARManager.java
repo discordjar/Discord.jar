@@ -3,8 +3,7 @@ package me.hammer86gn.discordjar.api;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordShardingWebsocketClient;
 import me.hammer86gn.discordjar.api.connection.websocket.DiscordWebsocketClient;
 import me.hammer86gn.discordjar.api.connection.websocket.intents.GatewayIntents;
-import me.hammer86gn.discordjar.api.users.activity.Activity;
-import me.hammer86gn.discordjar.api.users.activity.Status;
+import me.hammer86gn.discordjar.api.objects.activity.Activity;
 import me.hammer86gn.discordjar.impl.DJARimpl;
 
 import java.net.URISyntaxException;
@@ -102,11 +101,16 @@ public class DJARManager {
         return djar;
     }
 
-    public DJAR buildShardedClient(int maxShards) {
+    public DJAR buildShardedClient(int currentShard, int maxShards) {
         DJARimpl djarimpl = new DJARimpl(this.token,this.intents);
 
         try {
-            dwsc = new DiscordShardingWebsocketClient(djarimpl,maxShards);
+            if (activity != null) {
+                dwsc = new DiscordShardingWebsocketClient(djarimpl, activity, currentShard, maxShards);
+            } else {
+                dwsc = new DiscordShardingWebsocketClient(djarimpl, currentShard, maxShards);
+            }
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

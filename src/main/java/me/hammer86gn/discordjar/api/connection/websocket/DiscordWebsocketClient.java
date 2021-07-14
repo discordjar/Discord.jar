@@ -7,7 +7,7 @@ import com.google.gson.JsonParser;
 import me.hammer86gn.discordjar.api.DJAR;
 import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
-import me.hammer86gn.discordjar.api.users.activity.Activity;
+import me.hammer86gn.discordjar.api.objects.activity.Activity;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 

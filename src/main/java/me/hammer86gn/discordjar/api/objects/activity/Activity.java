@@ -1,4 +1,4 @@
-package me.hammer86gn.discordjar.api.users.activity;
+package me.hammer86gn.discordjar.api.objects.activity;
 
 public class Activity {
 
