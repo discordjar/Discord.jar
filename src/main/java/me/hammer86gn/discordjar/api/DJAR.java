@@ -1,5 +1,7 @@
 package me.hammer86gn.discordjar.api;
 
+import okhttp3.OkHttpClient;
+
 import java.util.logging.Logger;
 
 public interface DJAR {
@@ -9,4 +11,6 @@ public interface DJAR {
     String getBotToken();
 
     long getGatewayIntents();
+
+    OkHttpClient getHTTPClient();
 }

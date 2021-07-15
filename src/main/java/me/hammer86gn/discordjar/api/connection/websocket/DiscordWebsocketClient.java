@@ -101,7 +101,6 @@ public class DiscordWebsocketClient extends WebSocketClient {
         }
         if (tParam != null && tParam.equals("GUILD_CREATE")) {
             GuildCache.getInstance().cache(new GuildImpl(message.get("d").getAsJsonObject().get("id").getAsLong(),this.djar));
-            System.out.println("Guild created");
         }
 
     }
