@@ -21,6 +21,15 @@ public class GuildImpl implements Guild {
     }
 
     @Override
+    public void changeGuildName(String name) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name",name);
+        RestRequest request = new RestRequest(djar, "/guilds/" + getID(), RestRequest.RequestType.PATCH, jsonObject);
+
+        request.sendRequest();
+    }
+
+    @Override
     public String getGuildName() {
         return getGuildAsJson().get("name").getAsString();
     }
@@ -31,10 +40,28 @@ public class GuildImpl implements Guild {
     }
 
     @Override
+    public String getSplashHash() {
+        return getGuildAsJson().get("splash").getAsString();
+    }
+
+    @Override
     public URL getIconURL() {
         URL url = null;
         try {
             url = new URL("https://cdn.discordapp.com/icons/" + getID() + "/" + getIconHash() + ".png");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    @Override
+    public URL getSplashURL() {
+        URL url = null;
+
+        try {
+            url = new URL("https://cdn.discordapp.com/splashes/" + getID() + "/" + getSplashHash() + ".png");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

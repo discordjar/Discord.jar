@@ -7,11 +7,17 @@ import java.net.URL;
 
 public interface Guild {
 
+    void changeGuildName(String name);
+
     String getGuildName();
 
     String getIconHash();
 
+    String getSplashHash();
+
     URL getIconURL();
+
+    URL getSplashURL();
 
     long getOwnerID();
 

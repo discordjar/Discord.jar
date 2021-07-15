@@ -45,7 +45,7 @@ public class RestRequest {
         MediaType contentType = MediaType.parse("application/json");
         RequestBody requestBody = null;
         if (body != null) {
-            requestBody = RequestBody.create(body.getAsString(),contentType);
+            requestBody = RequestBody.create(body.toString(),contentType);
         }
 
         switch (type) {
