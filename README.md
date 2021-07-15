@@ -17,6 +17,20 @@ public class Main {
 
 }
 ```
+using Sharding
+```java
+public class MainSharding {
+    private final String TOKEN = "BOT_TOKEN_HERE";
+    
+    public static void main(String[] args) {
+        DJARManager manager = new DJARManager(TOKEN);
+        
+        for (int i = 0; i < 3; i++) {
+            manager.buildShardedClient(i, 3);
+        }
+    }
+}
+```
 
 ---
 
