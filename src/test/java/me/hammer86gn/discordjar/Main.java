@@ -10,10 +10,7 @@ public class Main {
     public static void main(String[] args) {
 
         DJARManager manager = new DJARManager(Hidden.TOKEN).setActivity(new Activity(new Status("With Discord.jar", Status.ActivityType.GAME), Status.StatusType.IDLE));
-
-        for (int i=0;i<3;i++) {
-            manager.buildShardedClient(i,4);
-        }
+        DJAR djar = manager.buildClient();
     }
 
 }
