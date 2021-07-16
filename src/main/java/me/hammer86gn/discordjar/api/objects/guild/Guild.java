@@ -7,18 +7,54 @@ import java.net.URL;
 
 public interface Guild {
 
+    /**
+     * Changes the guilds name
+     *
+     * @param name the new name for the guild
+     */
     void changeGuildName(String name);
 
+    /**
+     * Gets the name of the guild
+     *
+     * @return the name of the guild
+     */
     String getGuildName();
 
+    /**
+     * Gets the icon hash for the guild
+     *
+     * @return The icon hash
+     */
     String getIconHash();
 
+    /**
+     * Gets the splash hash for the guild
+     *
+     * @return The splash hash
+     */
     String getSplashHash();
 
+    /**
+     * Gets the icon url of the Guild
+     *
+     * @return The Formatted icon url
+     */
     URL getIconURL();
 
+
+    /**
+     * Gets the splash url of the Guild
+     *
+     * @return The Formatted splash url
+     */
     URL getSplashURL();
 
+    /**
+     * Get the Owner of the guild's id
+     *
+     * @return the snowflake id of the owner
+     */
     long getOwnerID();
 
     /**
@@ -35,6 +71,11 @@ public interface Guild {
      */
     long getID();
 
+    /**
+     * Gets the guild as a JSON
+     *
+     * @return The guild as a json object
+     */
     JsonObject getGuildAsJson();
 
 
