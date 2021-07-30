@@ -75,7 +75,7 @@ public class GuildImpl implements Guild {
     }
 
     @Override
-    public String getIDString() {
+    public String getIDAsString() {
         return String.valueOf(id);
     }
 

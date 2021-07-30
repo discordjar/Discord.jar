@@ -2,10 +2,11 @@ package me.hammer86gn.discordjar.api.objects.guild;
 
 import com.google.gson.JsonObject;
 import me.hammer86gn.discordjar.api.DJAR;
+import me.hammer86gn.discordjar.api.objects.IDiscordObject;
 
 import java.net.URL;
 
-public interface Guild {
+public interface Guild extends IDiscordObject {
 
     /**
      * Changes the guilds name
@@ -62,13 +63,15 @@ public interface Guild {
      *
      * @return String id of guild
      */
-    String getIDString();
+    @Override
+    String getIDAsString();
 
     /**
      * Get the id of the guild
      *
      * @return long id of the guild
      */
+    @Override
     long getID();
 
     /**
@@ -86,6 +89,7 @@ public interface Guild {
      * @return the DJAR instance inuse
      * @see {@link DJAR}
      */
+    @Override
     DJAR getDJAR();
 
 }
