@@ -6,74 +6,82 @@ import okhttp3.*;
 import okhttp3.Request.Builder;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class RestRequest {
 
-    private final String baseURL = "https://discord.com/api";
+    private final String baseURL = "https://discord.com/api/v9/";
+
     private final DJAR djar;
-    private final String apiURL;
-    private final RequestType type;
-    private final JsonObject body;
+    private final RequestType requestType;
+    private final JsonObject data;
+    private final String dest;
 
-    public RestRequest(DJAR djar, String url, RequestType type) {
+    private final OkHttpClient client;
+
+    public RestRequest(DJAR djar, RequestType requestType, String dest, JsonObject data) {
         this.djar = djar;
-        this.apiURL = baseURL + url;
-        this.type = type;
-        this.body = null;
+        this.requestType = requestType;
+        this.data = data;
+
+        this.dest = baseURL + dest;
+
+        this.client = djar.getHTTPClient();
     }
 
-    public RestRequest(DJAR djar, String url, RequestType type, JsonObject body) {
+    public RestRequest(DJAR djar, RequestType requestType, String dest) {
         this.djar = djar;
-        this.apiURL = baseURL + url;
-        this.type = type;
-        this.body = body;
-    }
+        this.requestType = requestType;
+        this.data = null;
 
-    public enum RequestType {
-        GET,
-        POST,
-        PATCH,
-        PUT,
-        DELETE
+        this.dest = baseURL + dest;
+
+        this.client = djar.getHTTPClient();
     }
 
     public Response sendRequest() {
-        Request.Builder requestBuilder = new Request.Builder()
-                .url(apiURL)
-                .addHeader("Authorization","Bot " + djar.getBotToken());
+        Request.Builder reqBuilder = new Request.Builder().url(dest).addHeader("Authorization","Bot " +  djar.getBotToken());
 
-        MediaType contentType = MediaType.parse("application/json");
-        RequestBody requestBody = null;
-        if (body != null) {
-            requestBody = RequestBody.create(body.toString(),contentType);
-        }
-
-        switch (type) {
+        switch (requestType) {
             case GET:
-                requestBuilder.get();
-                break;
-            case POST:
-                requestBuilder.post(requestBody);
+                reqBuilder.get();
                 break;
             case PUT:
-                requestBuilder.put(requestBody);
+                reqBuilder.put(RequestBody.create(data.toString(), MediaType.get("application/json")));
+                break;
+            case POST:
+                reqBuilder.post(RequestBody.create(data.toString(), MediaType.get("application/json")));
                 break;
             case PATCH:
-                requestBuilder.patch(requestBody);
+                reqBuilder.patch(RequestBody.create(data.toString(), MediaType.get("application/json")));
                 break;
             case DELETE:
-                requestBuilder.delete(requestBody);
+                if(data == null) {
+                    reqBuilder.delete();
+                } else {
+                    reqBuilder.delete(RequestBody.create(data.toString(), MediaType.get("application/json")));
+                }
+                break;
+            default:
+                reqBuilder.get();
+                break;
+
         }
 
-        Call call = djar.getHTTPClient().newCall(requestBuilder.build());
-
-        try {
-            return call.execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        if (RestManager.getInstance().canSend()) {
+            Call call = client.newCall(reqBuilder.build());
+            try {
+                Response res = call.execute();
+                RestManager.getInstance().addRequest();
+                return res;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
+        return null;
     }
+
 
 
 }

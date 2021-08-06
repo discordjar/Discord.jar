@@ -8,7 +8,17 @@ import me.hammer86gn.discordjar.impl.objects.snowflake.Snowflake;
  */
 public interface ISnowflake {
 
+    /**
+     * Gets the snowflake of the object
+     *
+     * @return the snowflake of the object
+     */
     Snowflake getSnowflake();
 
+    /**
+     * Gets the current DJAR instance
+     *
+     * @return DJAR instance
+     */
     DJAR getDJAR();
 }
