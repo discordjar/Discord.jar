@@ -8,8 +8,6 @@ import me.hammer86gn.discordjar.api.DJAR;
 import me.hammer86gn.discordjar.api.connection.websocket.exception.RateLimitOverflowException;
 import me.hammer86gn.discordjar.api.connection.websocket.payload.PayloadBuilder;
 import me.hammer86gn.discordjar.api.objects.activity.Activity;
-import me.hammer86gn.discordjar.impl.objects.cache.GuildCache;
-import me.hammer86gn.discordjar.impl.objects.guild.GuildImpl;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -99,10 +97,6 @@ public class DiscordWebsocketClient extends WebSocketClient {
                 hasSeq = true;
             }
         }
-        if (tParam != null && tParam.equals("GUILD_CREATE")) {
-            GuildCache.getInstance().cache(new GuildImpl(message.get("d").getAsJsonObject().get("id").getAsLong(),this.djar));
-        }
-
     }
 
     @Override
